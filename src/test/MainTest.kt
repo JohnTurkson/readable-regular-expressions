@@ -1,8 +1,13 @@
+import ast.regex
+import exceptions.RegexSyntaxException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 internal class MainTest {
+    
     @BeforeEach
     fun setUp() {
         
@@ -14,7 +19,15 @@ internal class MainTest {
     }
     
     @Test
-    fun main() {
-        println("Hello World")
+    fun testOptional() {
+        // Literal cannot contain optional, optional must contain a single group type object cases are covered at compile-time
+        val sb = StringBuilder()
+        regex {
+            optional {
+                literal { "a" }
+            }
+        }.render(sb)
+        assertEquals("a?", sb.toString())
     }
+
 }
