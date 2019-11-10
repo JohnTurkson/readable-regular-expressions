@@ -1,8 +1,8 @@
-package ast
+package dsl
 
 import exceptions.RegexSyntaxException
 
-class Literal(val characters : String) : Group("literal") {
+class Literal(private val characters : String) : Group() {
     
     override fun render(builder: StringBuilder) {
         if (characters.isEmpty()) {

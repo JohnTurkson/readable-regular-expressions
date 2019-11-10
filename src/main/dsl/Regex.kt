@@ -1,6 +1,6 @@
-package ast
+package dsl
 
-class Regex() : Node("regex") {
+class Regex : Node() {
     val expressions = arrayListOf<Node>()
     
     override fun render(builder: StringBuilder) {
