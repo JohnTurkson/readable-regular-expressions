@@ -18,9 +18,15 @@ internal class MainTest {
     
     @Test
     fun testOptional() {
-        assertEquals(regex {
+        assertEquals("a(?:bc(?:d)?)?", regex {
             literal { "a" }
-            optional { literal { "b" } }
-        }.toString(), "ab?")
+            optional {
+                literal { "b" }
+                literal { "c" }
+                optional {
+                    regex { literal { "d" } }
+                }
+            }
+        }.toString())
     }
 }
