@@ -2,6 +2,6 @@ package dsl
 
 class Optional : Group() {
     override fun toString(): String {
-        return children.joinToString(separator = "", postfix = "?")
+        return children.joinToString(separator = "", prefix = "(?:", postfix = ")?")
     }
 }
