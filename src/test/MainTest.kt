@@ -23,6 +23,10 @@ internal class MainTest {
             optional {
                 literal { "b" }
                 literal { "c" }
+                oneOf {
+                    literal { "1" }
+                    literal { "2" }
+                }
                 optional {
                     regex { literal { "d" } }
                 }
