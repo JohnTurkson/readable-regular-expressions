@@ -1,10 +1,7 @@
 package dsl
 
-
-class Optional(private val group: Group) : Group() {
-    
-    override fun render(builder: StringBuilder) {
-        group.render(builder)
-        builder.append("?")
+class Optional : Group() {
+    override fun toString(): String {
+        return children.joinToString(separator = "", postfix = "?")
     }
 }
