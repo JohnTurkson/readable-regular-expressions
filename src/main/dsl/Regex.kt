@@ -1,13 +1,17 @@
 package dsl
 
+import exceptions.RegexSyntaxException
+
 class Regex : Node() {
-    val expressions = arrayListOf<Node>()
+    private val expressions = mutableListOf<Node>()
     
-    override fun render(builder: StringBuilder) {
+    override fun toString(): String {
         // TODO
+        var builder = ""
         for (e in expressions) {
-            e.render(builder)
+            builder += e.toString()
         }
+        return builder
     }
     
     fun optional(init: () -> Group): Optional {
@@ -29,10 +33,10 @@ class Regex : Node() {
     }
     
     fun anyOf(init: AnyOf.() -> Any): AnyOf {
-        var node = AnyOf(arrayListOf())
+        var node = AnyOf(mutableListOf())
         val runVal = node.init()
         if(runVal is String) {
-            node = AnyOf(runVal)
+            node = AnyOf(mutableListOf(DSLEnum(runVal)))
         } else {
             require(runVal is Terminal)
         }
@@ -40,10 +44,22 @@ class Regex : Node() {
         return node
     }
     
-    fun noneOf(init: () -> String): NoneOf {
-        val node = NoneOf(init())
+    fun noneOf(init: NoneOf.() -> Any): NoneOf {
+        var node = NoneOf(mutableListOf())
+        val runVal = node.init()
+        if(runVal is String) {
+            node = NoneOf(mutableListOf(DSLEnum(runVal)))
+        } else {
+            require(runVal is Terminal)
+        }
         expressions.add(node)
         return node
+    }
+    
+    fun range(init: () -> ClosedRange<*>): DSLRange {
+        val range = init()
+        val r = range.toString().split("\\.\\.".toRegex())
+        return DSLRange(r[0], r[1])
     }
     
     fun literal(init: () -> String): Literal {

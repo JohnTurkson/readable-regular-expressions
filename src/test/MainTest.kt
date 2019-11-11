@@ -19,90 +19,85 @@ internal class MainTest {
     @Test
     fun testOptional() {
         // Literal cannot contain optional, optional must contain a single group type object cases are covered at compile-time
-        val sb = StringBuilder()
-        regex {
+        assertEquals("a?", regex {
             optional {
                 literal { "a" }
             }
-        }.render(sb)
-        assertEquals("a?", sb.toString())
+        }.toString())
     }
     
     @Test
     fun testZeroOrMore() {
-        val sb = StringBuilder()
-        regex {
+        assertEquals("a*", regex {
             zeroOrMore {
                 literal { "a" }
             }
-        }.render(sb)
-        assertEquals("a*", sb.toString())
+        }.toString())
     }
     
     @Test
     fun testOneOrMore() {
-        val sb = StringBuilder()
-        regex {
+        assertEquals("a+", regex {
             oneOrMore {
                 literal { "a" }
             }
-        }.render(sb)
-        assertEquals("a+", sb.toString())
+        }.toString())
     }
     
     @Test
     fun testanyOf() {
-        var sb = StringBuilder()
-        regex {
+        assertEquals("[1-7]", regex {
             anyOf {
-                "a..z"
+                range {1..7}
             }
-        }.render(sb)
-        assertEquals("[a-z]", sb.toString())
-    
-        sb = StringBuilder()
-        regex {
+        }.toString())
+        
+        assertEquals("[abc]", regex {
             anyOf {
                 "abc"
             }
-        }.render(sb)
-        assertEquals("[abc]", sb.toString())
+        }.toString())
     
-        sb = StringBuilder()
-        regex {
+        assertEquals("[abcD-F]", regex {
+            anyOf {
+                literal { "a" }
+                literal { "b" }
+                literal { "c" }
+                range{"D".."F"}
+            }
+        }.toString())
+        
+        assertEquals("(\"aa\"|\"bb\"|\"cc\")", regex {
             anyOf {
                 literal { "aa" }
                 literal { "bb" }
                 literal { "cc" }
             }
-        }.render(sb)
-        assertEquals("(\"aa\"|\"bb\"|\"cc\")", sb.toString())
+        }.toString())
     }
     
     @Test
     fun testNoneOf() {
-        var sb = StringBuilder()
-        regex {
+        assertEquals("[^a-z]", regex {
             noneOf {
-                "a..z"
+                range { "a".."z" }
             }
-        }.render(sb)
-        assertEquals("[^a-z]", sb.toString())
+        }.toString())
         
-        sb = StringBuilder()
-        regex {
+        assertEquals("[^abc]", regex {
             noneOf {
                 "abc"
             }
-        }.render(sb)
-        assertEquals("[^abc]", sb.toString())
-        sb = StringBuilder()
-        regex {
+        }.toString())
+    
+        assertEquals("[^D-Fabc]", regex {
             noneOf {
-                "abc, D..Z"
+                range{"D".."F"}
+                literal { "a" }
+                literal { "b" }
+                literal { "c" }
             }
-        }.render(sb)
-        assertEquals("[^abcD-Z]", sb.toString())
+        }.toString())
     }
 
 }

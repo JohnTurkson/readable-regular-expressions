@@ -1,42 +1,42 @@
 package dsl
 
-class AnyOf(private val content : ArrayList<Terminal>) : Group() {
-    
-    constructor(s : String) : this(parseString(s))
+open class AnyOf(private val content : MutableList<Terminal>) : Group() {
 
 //    Literals can be sequences of multiple characters and must be handled differently
-    override fun render(builder: StringBuilder) {
+    override fun toString(): String {
         var previousIsLiteral = false
+        var builder = ""
     
         for (e in content) {
-            if(e is Literal){
+            if(e is Literal && e.toString().length > 1){
                 if(!previousIsLiteral) {
-                    builder.append('(')
+                    builder += '('
                 } else {
-                    builder.append('|')
+                    builder += '|'
                 }
-                builder.append('"')
+                builder += '"'
+    
+                builder += e.toString()
                 
-                e.render(builder)
-                
-                builder.append('"')
+                builder += '"'
                 previousIsLiteral = true
             } else {
                 if(previousIsLiteral){
-                    builder.append(")|[")
+                    builder += ")|["
                 } else if (e == content[0]) {
-                    builder.append("[")
+                    builder += "["
                 }
-                e.render(builder)
+                builder += e.toString()
             }
             
         }
     
         if(previousIsLiteral){
-            builder.append(")")
+            builder += ")"
         } else {
-            builder.append("]")
+            builder += "]"
         }
+        return builder
         
     }
     
@@ -47,25 +47,19 @@ class AnyOf(private val content : ArrayList<Terminal>) : Group() {
         return lit
     }
     
-}
-
-class Enum(val v : String) : Terminal() {
-    override fun render(builder: StringBuilder) {
-        builder.append(v)
+    fun range(init: () -> Any): DSLRange {
+        val range = init()
+        val lst = range.toString().split("\\.\\.".toRegex())
+        val r = DSLRange(lst[0], lst[1])
+        content.add(r)
+        return r
     }
-}
-
-fun parseString(s: String) : ArrayList<Terminal> {
-    val los = s.split(",")
-    val list = arrayListOf<Terminal>()
     
-    for (elem in los) {
-        if(".." in elem) {
-            val r = elem.trim().split("\\.\\.".toRegex())
-            list.add(Range(r[0], r[1]))
-        } else {
-            list.add(Enum(elem.trim()))
-        }
-    }
-    return list
 }
+
+class DSLEnum(val v : String) : Terminal() {
+    override fun toString(): String {
+        return v
+    }
+}
+
