@@ -16,6 +16,36 @@ class Regex : Node() {
         return node
     }
     
+    fun zeroOrMore(init: () -> Group): ZeroOrMore {
+        val node = ZeroOrMore(init())
+        expressions.add(node)
+        return node
+    }
+    
+    fun oneOrMore(init: () -> Group): OneOrMore {
+        val node = OneOrMore(init())
+        expressions.add(node)
+        return node
+    }
+    
+    fun anyOf(init: AnyOf.() -> Any): AnyOf {
+        var node = AnyOf(arrayListOf())
+        val runVal = node.init()
+        if(runVal is String) {
+            node = AnyOf(runVal)
+        } else {
+            require(runVal is Terminal)
+        }
+        expressions.add(node)
+        return node
+    }
+    
+    fun noneOf(init: () -> String): NoneOf {
+        val node = NoneOf(init())
+        expressions.add(node)
+        return node
+    }
+    
     fun literal(init: () -> String): Literal {
         return Literal(init())
     }
