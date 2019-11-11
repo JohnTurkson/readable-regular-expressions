@@ -25,7 +25,6 @@ open class Regex {
     
     fun captureGroup(init: CaptureGroup.() -> Regex): Regex {
         val captureGroup = CaptureGroup().init()
-        require(captureGroup.children.size == 1) { "capture groups can only contain one group" }
         this.children.add(captureGroup)
         return this
     }
@@ -38,7 +37,6 @@ open class Regex {
     
     fun optional(init: Optional.() -> Regex): Regex {
         val optional = Optional().init()
-        require(optional.children.size == 1) { "optional blocks can only contain one group" }
         this.children.add(optional)
         return this
     }
