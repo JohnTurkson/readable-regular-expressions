@@ -1,3 +1,5 @@
+import dsl.Flags
+import dsl.Flags.*
 import dsl.regex
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -22,6 +24,18 @@ internal class MainTest {
         assertEquals("a?", regex {
             optional {
                 literal { "a" }
+            }
+        }.toString())
+    }
+    
+    @Test
+    fun testOptionalNested() {
+        // Literal cannot contain optional, optional must contain a single group type object cases are covered at compile-time
+        assertEquals("a?", regex {
+            optional {
+                optional {
+                    literal { "a" }
+                }
             }
         }.toString())
     }
@@ -98,6 +112,39 @@ internal class MainTest {
                 literal { "c" }
             }
         }.toString())
+    }
+    
+    @Test
+    fun testFlagCaseInsensitive() {
+        assertEquals("(?i)A", regex {
+            flags {
+                CASE_INSENSITIVE
+            }
+            literal { "A" }
+        }.toString())
+    
+        assertEquals("(?i)a", regex {
+            flags {
+                CASE_INSENSITIVE
+            }
+            literal { "a" }
+        }.toString())
+    }
+    
+    @Test
+    fun testFlagCaseInsensitiveNested() {
+        assertEquals("(?i)[^D-Fabc]", regex {
+            flags {
+                CASE_INSENSITIVE
+            }
+            noneOf {
+                range{"D".."F"}
+                literal { "a" }
+                literal { "b" }
+                literal { "c" }
+            }
+        }.toString())
+        
     }
 
 }

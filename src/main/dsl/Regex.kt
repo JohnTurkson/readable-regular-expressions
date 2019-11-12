@@ -1,13 +1,16 @@
 package dsl
 
-import exceptions.RegexSyntaxException
-
 class Regex : Node() {
     private val expressions = mutableListOf<Node>()
+    private var flags: String = ""
+    
     
     override fun toString(): String {
         // TODO
         var builder = ""
+        if (flags.length != 0) {
+            builder+= "(?$flags)"
+        }
         for (e in expressions) {
             builder += e.toString()
         }
@@ -63,7 +66,14 @@ class Regex : Node() {
     }
     
     fun literal(init: () -> String): Literal {
-        return Literal(init())
+        val literal = Literal(init())
+        expressions.add(literal)
+        return literal
+    }
+    
+    fun flags(init: () -> Flags) {
+        val group = init()
+        flags += group.whichFlag
     }
 }
 
