@@ -1,12 +1,11 @@
-import dsl.Flags
-import dsl.Flags.*
+import dsl.Flags.CASE_INSENSITIVE
 import dsl.regex
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-internal class MainTest {
+internal class RegexTest {
     
     @BeforeEach
     fun setUp() {
@@ -57,7 +56,7 @@ internal class MainTest {
             }
         }.toString())
     }
-
+    
     @Test
     fun testWildCard() {
         assertEquals(".a+b*.", regex {
@@ -76,7 +75,7 @@ internal class MainTest {
     fun testanyOf() {
         assertEquals("[1-7]", regex {
             anyOf {
-                range {1..7}
+                range { 1..7 }
             }
         }.toString())
         
@@ -85,13 +84,13 @@ internal class MainTest {
                 "abc"
             }
         }.toString())
-    
+        
         assertEquals("[abcD-F]", regex {
             anyOf {
                 literal { "a" }
                 literal { "b" }
                 literal { "c" }
-                range{"D".."F"}
+                range { "D".."F" }
             }
         }.toString())
         
@@ -117,10 +116,10 @@ internal class MainTest {
                 "abc"
             }
         }.toString())
-    
+        
         assertEquals("[^D-Fabc]", regex {
             noneOf {
-                range{"D".."F"}
+                range { "D".."F" }
                 literal { "a" }
                 literal { "b" }
                 literal { "c" }
@@ -136,7 +135,7 @@ internal class MainTest {
             }
             literal { "A" }
         }.toString())
-    
+        
         assertEquals("(?i)a", regex {
             flags {
                 CASE_INSENSITIVE
@@ -152,13 +151,22 @@ internal class MainTest {
                 CASE_INSENSITIVE
             }
             noneOf {
-                range{"D".."F"}
+                range { "D".."F" }
                 literal { "a" }
                 literal { "b" }
                 literal { "c" }
             }
         }.toString())
-        
     }
-
+    
+    @Test
+    fun testOneOf() {
+        assertEquals("(?:a|b|c)", regex {
+            oneOf {
+                literal { "a" }
+                literal { "b" }
+                literal { "c" }
+            }
+        }.toString())
+    }
 }
