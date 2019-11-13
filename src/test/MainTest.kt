@@ -57,6 +57,20 @@ internal class MainTest {
             }
         }.toString())
     }
+
+    @Test
+    fun testWildCard() {
+        assertEquals(".a+b*.", regex {
+            wildcard()
+            oneOrMore {
+                literal { "a" }
+            }
+            zeroOrMore {
+                literal { "b" }
+            }
+            wildcard()
+        }.toString())
+    }
     
     @Test
     fun testanyOf() {

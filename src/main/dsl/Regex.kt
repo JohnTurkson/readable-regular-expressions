@@ -34,6 +34,12 @@ class Regex : Node() {
         expressions.add(node)
         return node
     }
+
+    fun wildcard(): WildCard {
+        val node = WildCard()
+        expressions.add(node)
+        return node
+    }
     
     fun anyOf(init: AnyOf.() -> Any): AnyOf {
         var node = AnyOf(mutableListOf())
