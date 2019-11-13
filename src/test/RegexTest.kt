@@ -72,6 +72,24 @@ internal class RegexTest {
     }
     
     @Test
+    fun testRepeatExact() {
+        assertEquals("a{5}", regex {
+            repeat(5) {
+                literal { "a" }
+            }
+        }.toString())
+    }
+    
+    @Test
+    fun testRepeatMinMax() {
+        assertEquals("a{5,7}", regex {
+            repeat(5,7) {
+                literal { "a" }
+            }
+        }.toString())
+    }
+    
+    @Test
     fun testanyOf() {
         assertEquals("[1-7]", regex {
             anyOf {

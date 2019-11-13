@@ -83,6 +83,20 @@ class Regex : Node() {
         return DSLRange(r[0], r[1])
     }
     
+    // repeat [min..max] number of groups
+    fun repeat(min : Int, max : Int, init: () -> Group) : Repeat {
+        val repeat = Repeat(min, max, init())
+        expressions.add(repeat);
+        return repeat
+    }
+    
+    // repeat exact number of groups
+    fun repeat(exact : Int, init: () -> Group) : Repeat {
+        val repeat = Repeat(exact, exact, init())
+        expressions.add(repeat)
+        return repeat
+    }
+    
     fun literal(init: () -> String): Literal {
         val literal = Literal(init())
         expressions.add(literal)
