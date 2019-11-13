@@ -8,8 +8,8 @@ class Regex : Node() {
     override fun toString(): String {
         // TODO
         var builder = ""
-        if (flags.length != 0) {
-            builder+= "(?$flags)"
+        if (flags.isNotEmpty()) {
+            builder += "(?$flags)"
         }
         for (e in expressions) {
             builder += e.toString()
@@ -34,7 +34,7 @@ class Regex : Node() {
         expressions.add(node)
         return node
     }
-
+    
     fun wildcard(): WildCard {
         val node = WildCard()
         expressions.add(node)
@@ -44,7 +44,7 @@ class Regex : Node() {
     fun anyOf(init: AnyOf.() -> Any): AnyOf {
         var node = AnyOf(mutableListOf())
         val runVal = node.init()
-        if(runVal is String) {
+        if (runVal is String) {
             node = AnyOf(mutableListOf(DSLEnum(runVal)))
         } else {
             require(runVal is Terminal)
@@ -56,8 +56,20 @@ class Regex : Node() {
     fun noneOf(init: NoneOf.() -> Any): NoneOf {
         var node = NoneOf(mutableListOf())
         val runVal = node.init()
-        if(runVal is String) {
+        if (runVal is String) {
             node = NoneOf(mutableListOf(DSLEnum(runVal)))
+        } else {
+            require(runVal is Terminal)
+        }
+        expressions.add(node)
+        return node
+    }
+    
+    fun oneOf(init: OneOf.() -> Any): OneOf {
+        var node = OneOf(mutableListOf())
+        val runVal = node.init()
+        if (runVal is String) {
+            node = OneOf(mutableListOf(DSLEnum(runVal)))
         } else {
             require(runVal is Terminal)
         }

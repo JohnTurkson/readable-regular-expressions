@@ -1,45 +1,41 @@
 package dsl
 
-open class AnyOf(private val content : MutableList<Terminal>) : Group() {
-
-//    Literals can be sequences of multiple characters and must be handled differently
+open class AnyOf(private val content: MutableList<Terminal>) : Group() {
+    
+    // Literals can be sequences of multiple characters and must be handled differently
     override fun toString(): String {
         var previousIsLiteral = false
         var builder = ""
-    
+        
         for (e in content) {
-            if(e is Literal && e.toString().length > 1){
-                if(!previousIsLiteral) {
+            if (e is Literal && e.toString().length > 1) {
+                if (!previousIsLiteral) {
                     builder += '('
                 } else {
                     builder += '|'
                 }
-                builder += '"'
-    
-                builder += e.toString()
                 
+                builder += '"'
+                builder += e.toString()
                 builder += '"'
                 previousIsLiteral = true
             } else {
-                if(previousIsLiteral){
+                if (previousIsLiteral) {
                     builder += ")|["
                 } else if (e == content[0]) {
                     builder += "["
                 }
                 builder += e.toString()
             }
-            
         }
-    
-        if(previousIsLiteral){
+        
+        if (previousIsLiteral) {
             builder += ")"
         } else {
             builder += "]"
         }
         return builder
-        
     }
-    
     
     fun literal(init: () -> String): Literal {
         val lit = Literal(init())
@@ -57,7 +53,7 @@ open class AnyOf(private val content : MutableList<Terminal>) : Group() {
     
 }
 
-class DSLEnum(val v : String) : Terminal() {
+class DSLEnum(val v: String) : Terminal() {
     override fun toString(): String {
         return v
     }
