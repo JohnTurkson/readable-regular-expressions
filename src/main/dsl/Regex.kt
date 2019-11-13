@@ -1,7 +1,5 @@
 package dsl
 
-import exceptions.RegexSyntaxException
-
 class Regex : Node() {
     private val expressions = mutableListOf<Node>()
     
@@ -28,6 +26,12 @@ class Regex : Node() {
     
     fun oneOrMore(init: () -> Group): OneOrMore {
         val node = OneOrMore(init())
+        expressions.add(node)
+        return node
+    }
+
+    fun wildcard(): WildCard {
+        val node = WildCard()
         expressions.add(node)
         return node
     }
