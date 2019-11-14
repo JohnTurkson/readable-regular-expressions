@@ -29,15 +29,15 @@ open class Regex {
         return this
     }
     
-    fun regex(init: Regex.() -> Regex): Regex {
-        val regex = Regex().init()
-        this.children.add(regex)
-        return this
-    }
-    
     fun optional(init: Optional.() -> Regex): Regex {
         val optional = Optional().init()
         this.children.add(optional)
+        return this
+    }
+    
+    fun regex(init: Regex.() -> Regex): Regex {
+        val regex = Regex().init()
+        this.children.add(regex)
         return this
     }
 }
