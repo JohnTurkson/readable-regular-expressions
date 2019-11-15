@@ -14,15 +14,15 @@ open class Regex {
     }
     
     override fun toString(): String {
-        val regex = StringBuilder()
+        var regex = ""
         
         if (modifiers.isNotEmpty()) {
-            regex.append(modifiers.joinToString(separator = "", prefix = "(?", postfix = ")"))
+            regex += (modifiers.joinToString(separator = "", prefix = "(?", postfix = ")"))
         }
         
-        regex.append(children.joinToString(separator = ""))
+        regex += (children.joinToString(separator = ""))
         
-        return regex.toString()
+        return regex
     }
     
     fun toRegex(): kotlin.text.Regex {
