@@ -1,14 +1,36 @@
 package dsl
 
 open class Regex {
+    private val modifiers: MutableList<Flag> = mutableListOf()
     internal val children: MutableList<Regex> = mutableListOf()
     
+    class Modifiers {
+        internal val flags: MutableList<Flag> = mutableListOf()
+        
+        fun flag(init: Modifiers.() -> Flag): Modifiers {
+            flags.add(init())
+            return this
+        }
+    }
+    
     override fun toString(): String {
-        return children.joinToString(separator = "")
+        val regex = StringBuilder()
+        
+        if (modifiers.isNotEmpty()) {
+            regex.append(modifiers.joinToString(separator = "", prefix = "(?", postfix = ")"))
+        }
+        
+        regex.append(children.joinToString(separator = ""))
+        
+        return regex.toString()
     }
     
     fun toRegex(): kotlin.text.Regex {
         return Regex(this.toString())
+    }
+    
+    fun modifiers(init: Modifiers.() -> Modifiers) {
+        modifiers += Modifiers().init().flags
     }
     
     fun literal(init: () -> String): Regex {
