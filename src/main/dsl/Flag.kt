@@ -1,7 +1,7 @@
 package dsl
 
-enum class Flag {
-    IGNORECASE,
-    MULTILINE,
-    DOTALL
+enum class Flag(val code:String) {
+    IGNORECASE("i"),
+    MULTILINE("m"),
+    DOTALL("s")
 }
