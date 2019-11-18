@@ -22,7 +22,8 @@ open class Regex {
         // return "<" + children.filter { it.toString().isNotBlank() }.joinToString(separator = "") + ">"
         return "(?:" + groups.joinToString(separator = "") {
             if (modifiers.contains(it)) {
-                "${modifiers[it]}$it"
+                "(?" + modifiers[it]!!.enabled.joinToString(separator = "") {it.code} + "-" +
+                        modifiers[it]!!.disabled.joinToString(separator = "") + ":" + it + ")"
             } else {
                 it.toString()
             }
