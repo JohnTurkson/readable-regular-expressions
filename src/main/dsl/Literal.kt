@@ -1,17 +1,7 @@
 package dsl
 
-class Literal(internal var value: String = ""): Group() {
-    private val flags = Modifiers()
-    
-    override fun flags(init: Modifiers.() -> Modifiers) {
-        flags.enabled += Modifiers().init().enabled
-        flags.disabled += Modifiers().init().disabled
-    }
-    
+class Literal(internal var text: String = "") : Group() {
     override fun toString(): String {
-        return when {
-            flags.isEmpty() -> value
-            else -> "$flags$value"
-        }
+        return text
     }
 }
