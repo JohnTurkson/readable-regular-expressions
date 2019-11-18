@@ -1,31 +1,9 @@
 package dsl
 
 open class Regex {
-    internal val children: MutableList<Regex> = mutableListOf()
+    internal val groups: MutableList<Regex> = mutableListOf()
     internal val modifiers: MutableMap<Regex, Modifiers> = mutableMapOf()
     internal var previousModifiers: Modifiers = Modifiers()
-    
-    data class Modifiers(internal val enabled: MutableList<Flag> = mutableListOf(),
-                         internal val disabled: MutableList<Flag> = mutableListOf()) {
-        
-        fun enable(init: Modifiers.() -> Flag): Modifiers {
-            enabled += init()
-            return this
-        }
-        
-        fun disable(init: Modifiers.() -> Flag): Modifiers {
-            disabled += init()
-            return this
-        }
-        
-        override fun toString(): String {
-            return if (enabled.isEmpty() && disabled.isEmpty()) ""
-            else "(?" +
-                    enabled.joinToString(separator = "") { it.code } +
-                    disabled.joinToString(separator = "") { "-" + it.code } +
-                    ")"
-        }
-    }
     
     override fun toString(): String {
         // var result = ""
@@ -41,7 +19,14 @@ open class Regex {
         // return result
         
         // println(children.filter { it.toString().isNotBlank() }.count())
-        return "<" + children.filter { it.toString().isNotBlank() }.joinToString(separator = "") + ">"
+        // return "<" + children.filter { it.toString().isNotBlank() }.joinToString(separator = "") + ">"
+        return "(?:" + groups.joinToString(separator = "") {
+            if (modifiers.contains(it)) {
+                "${modifiers[it]}$it"
+            } else {
+                it.toString()
+            }
+        } + ")"
     }
     
     fun toRegex(): kotlin.text.Regex {
@@ -49,31 +34,23 @@ open class Regex {
     }
     
     open fun flags(init: Modifiers.() -> Modifiers) {
-        // val copy = Modifiers()
-        // previousModifiers.enabled.forEach { copy.enable { it } }
-        // previousModifiers.disabled.forEach { copy.disable { it } }
-        //
-        // val modifier = copy.init()
-        // previousModifiers = modifier
-        val blank = Regex()
-        children.add(blank)
-        modifiers[blank] = Modifiers().init()
+        val copy = Modifiers()
+        previousModifiers.enabled.forEach { copy.enable { it } }
+        previousModifiers.disabled.forEach { copy.disable { it } }
+
+        val modifier = copy.init()
+        previousModifiers = modifier
+        
+        // val blank = Regex()
+        // groups.add(blank)
+        // modifiers[blank] = Modifiers().init()
     }
     
     fun literal(init: Literal.() -> String): Regex {
-        // val copy = Modifiers()
-        // previousModifiers.enabled.forEach { copy.enable { it } }
-        // previousModifiers.disabled.forEach { copy.disable { it } }
-        //
-        // val literal = Literal(init())
-        // children.add(literal)
-        // modifiers.add(previousModifiers)
-        //
-        // previousModifiers = copy
-        // return this
-        
-        val literal = Literal(Literal().init())
-        children.add(literal)
+        val literal = Literal()
+        literal.value = literal.init()
+        groups.add(literal)
+        modifiers[literal] = previousModifiers
         return this
     }
     
@@ -83,11 +60,12 @@ open class Regex {
     //     return this
     // }
     //
-    // fun captureGroup(init: CaptureGroup.() -> Regex): Regex {
-    //     val captureGroup = CaptureGroup().init()
-    //     this.children.add(captureGroup)
-    //     return this
-    // }
+    fun captureGroup(init: CaptureGroup.() -> Regex): Regex {
+        val captureGroup = CaptureGroup().init()
+        groups.add(captureGroup)
+        modifiers[captureGroup] = previousModifiers
+        return this
+    }
     //
     // fun optional(init: Optional.() -> Regex): Regex {
     //     val optional = Optional().init()
@@ -99,20 +77,46 @@ open class Regex {
         // val copy = Modifiers()
         // previousModifiers.enabled.forEach { copy.enable { it } }
         // previousModifiers.disabled.forEach { copy.disable { it } }
-        
+
         val regex = Regex().init()
-        children.add(regex)
-        modifiers[regex] = Modifiers()
-        
+        groups.add(regex)
+        modifiers[regex] = previousModifiers
+
         // copy.enabled.forEach { c -> regex.modifiers.forEach { modifier -> modifier.enable { c } } }
         // copy.disabled.forEach { c -> regex.modifiers.forEach { modifier -> modifier.disable { c } } }
-        
+
         // copy.enabled.forEach { regex.previousModifiers.enable { it } }
         // copy.disabled.forEach { regex.previousModifiers.disable { it } }
-        
+
         // this.modifiers.add(regex.previousModifiers)
-        
+
         return this
+    }
+}
+
+data class Modifiers(internal val enabled: MutableList<Flag> = mutableListOf(),
+                     internal val disabled: MutableList<Flag> = mutableListOf()) {
+    
+    fun enable(init: Modifiers.() -> Flag): Modifiers {
+        enabled += init()
+        return this
+    }
+    
+    fun disable(init: Modifiers.() -> Flag): Modifiers {
+        disabled += init()
+        return this
+    }
+    
+    fun isEmpty(): Boolean {
+        return enabled.isEmpty() && disabled.isEmpty()
+    }
+    
+    override fun toString(): String {
+        return if (enabled.isEmpty() && disabled.isEmpty()) ""
+        else "(?" +
+                enabled.joinToString(separator = "") { it.code } +
+                disabled.joinToString(separator = "") { "-" + it.code } +
+                ")"
     }
 }
 

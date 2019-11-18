@@ -1,30 +1,17 @@
 package dsl
 
-class Literal(private val value: String = "") : Regex() {
+class Literal(internal var value: String = ""): Group() {
+    private val flags = Modifiers()
+    
     override fun flags(init: Modifiers.() -> Modifiers) {
-        // val copy = Modifiers()
-        // previousModifiers.enabled.forEach { copy.enable { it } }
-        // previousModifiers.disabled.forEach { copy.disable { it } }
-        //
-        // val modifier = copy.init()
-        // previousModifiers = modifier
-        
-        println(modifiers.values)
-        val modifier = Modifiers().init()
-        if (modifiers.containsKey(this)) {
-            modifiers[this]!!.enabled.addAll(modifier.enabled)
-            modifiers[this]!!.disabled.addAll(modifier.disabled)
-        } else {
-            modifiers[this] = Modifiers().init()
-        }
-        println(modifiers.values)
+        flags.enabled += Modifiers().init().enabled
+        flags.disabled += Modifiers().init().disabled
     }
     
     override fun toString(): String {
-        if (modifiers.containsKey(this)) {
-            return "(?:" + modifiers[this] + value + ")"
-        } else {
-            return value
+        return when {
+            flags.isEmpty() -> value
+            else -> "$flags$value"
         }
     }
 }

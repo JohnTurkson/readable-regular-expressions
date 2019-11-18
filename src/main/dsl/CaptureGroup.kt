@@ -2,6 +2,12 @@ package dsl
 
 class CaptureGroup : Group() {
     override fun toString(): String {
-        return children.joinToString(separator = "", prefix = "(", postfix = ")")
+        return "(" + groups.joinToString(separator = "") {
+            if (modifiers.contains(it)) {
+                "${modifiers[it].toString()}$it"
+            } else {
+                "$it"
+            }
+        } + ")"
     }
 }
