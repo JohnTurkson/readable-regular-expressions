@@ -1,102 +1,126 @@
 package dsl
 
-class Regex : Node() {
-    private val expressions = mutableListOf<Node>()
-    private var flags: String = ""
-    
+import dsl.RepetitionType.*
+
+open class Regex {
+    internal val groups: MutableList<Regex> = mutableListOf()
     
     override fun toString(): String {
-        // TODO
-        var builder = ""
-        if (flags.isNotEmpty()) {
-            builder += "(?$flags)"
-        }
-        for (e in expressions) {
-            builder += e.toString()
-        }
-        return builder
+        return groups.joinToString(separator = "")
     }
     
-    fun optional(init: () -> Group): Optional {
-        val node = Optional(init())
-        expressions.add(node)
-        return node
+    fun toRegex(): kotlin.text.Regex {
+        return Regex(this.toString())
     }
     
-    fun zeroOrMore(init: () -> Group): ZeroOrMore {
-        val node = ZeroOrMore(init())
-        expressions.add(node)
-        return node
+    fun literal(init: Literal.() -> String): Regex {
+        val literal = Literal()
+        literal.text = literal.init()
+        groups += literal
+        return this
     }
     
-    fun oneOrMore(init: () -> Group): OneOrMore {
-        val node = OneOrMore(init())
-        expressions.add(node)
-        return node
+    fun anchor(init: () -> Anchor): Regex {
+        val anchor = init()
+        groups += AnchorGroup(anchor)
+        return this
     }
     
-    fun wildcard(): WildCard {
-        val node = WildCard()
-        expressions.add(node)
-        return node
+    fun captureGroup(init: CaptureGroup.() -> Regex): Regex {
+        val captureGroup = CaptureGroup().init()
+        groups += captureGroup
+        return this
     }
     
-    fun anyOf(init: AnyOf.() -> Any): AnyOf {
-        var node = AnyOf(mutableListOf())
-        val runVal = node.init()
-        if (runVal is String) {
-            node = AnyOf(mutableListOf(DSLEnum(runVal)))
-        } else {
-            require(runVal is Terminal)
-        }
-        expressions.add(node)
-        return node
+    fun nonCaptureGroup(init: NonCaptureGroup.() -> Regex): Regex {
+        val nonCaptureGroup = NonCaptureGroup().init()
+        groups += nonCaptureGroup
+        return this
     }
     
-    fun noneOf(init: NoneOf.() -> Any): NoneOf {
-        var node = NoneOf(mutableListOf())
-        val runVal = node.init()
-        if (runVal is String) {
-            node = NoneOf(mutableListOf(DSLEnum(runVal)))
-        } else {
-            require(runVal is Terminal)
-        }
-        expressions.add(node)
-        return node
+    fun optional(init: OptionalGroup.() -> Regex): Regex {
+        val optional = OptionalGroup().init()
+        groups += optional
+        return this
     }
     
-    fun oneOf(init: OneOf.() -> Any): OneOf {
-        var node = OneOf(mutableListOf())
-        val runVal = node.init()
-        if (runVal is String) {
-            node = OneOf(mutableListOf(DSLEnum(runVal)))
-        } else {
-            require(runVal is Terminal)
-        }
-        expressions.add(node)
-        return node
+    fun repeat(init: RepeatedGroup.() -> Regex): Regex {
+        val repeat = RepeatedGroup(AT_LEAST, 1).init()
+        groups += repeat
+        return this
     }
     
-    fun range(init: () -> ClosedRange<*>): DSLRange {
-        val range = init()
-        val r = range.toString().split("\\.\\.".toRegex())
-        return DSLRange(r[0], r[1])
+    fun repeat(min: Int, max: Int, init: RepeatedGroup.() -> Regex): Regex {
+        require(min >= 0)
+        require(max >= 0)
+        require(max >= min)
+        
+        val repeat = RepeatedGroup(EXACTLY, min, max).init()
+        groups += repeat
+        return this
     }
     
-    fun literal(init: () -> String): Literal {
-        val literal = Literal(init())
-        expressions.add(literal)
-        return literal
+    fun repeat(range: IntRange, init: RepeatedGroup.() -> Regex): Regex {
+        require(range.first >= 0)
+        require(range.last >= 0)
+        require(range.last >= range.first)
+        
+        val repeat = RepeatedGroup(EXACTLY, range.first, range.last).init()
+        groups += repeat
+        return this
     }
     
-    fun flags(init: () -> Flags) {
-        val group = init()
-        flags += group.whichFlag
+    fun repeat(rule: RepetitionType, amount: Int, init: RepeatedGroup.() -> Regex): Regex {
+        require(amount >= 0)
+        
+        val repeat = RepeatedGroup(rule, amount, amount).init()
+        groups += repeat
+        return this
+    }
+    
+    fun either(init: Selection.() -> Regex): Regex {
+        val selection = Selection().init()
+        groups += selection
+        return this
+    }
+    
+    fun atomic(init: AtomicGroup.() -> Regex): Regex {
+        val atomic = AtomicGroup().init()
+        groups += atomic
+        return this
+    }
+    
+    fun assertAhead() {
+        
+    }
+    
+    fun assertNotAhead() {
+        
+    }
+    
+    fun assertBehind() {
+        
+    }
+    
+    fun assertNotBehind() {
+        
+    }
+    
+    // fun lazy(init: LazyGroup.() -> Regex): Regex {
+    //
+    // }
+    //
+    // fun possessive(init: GreedyGroup.() -> Regex): Regex {
+    //
+    // }
+    
+    fun regex(init: Regex.() -> Regex): Regex {
+        val regex = Regex().init()
+        groups += regex
+        return this
     }
 }
 
-fun regex(init: Regex.() -> Unit): Regex {
-    val node = Regex()
-    node.init()
-    return node
+fun regex(init: Regex.() -> Regex): kotlin.text.Regex {
+    return Regex().init().toRegex()
 }
