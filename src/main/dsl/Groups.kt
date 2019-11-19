@@ -1,14 +1,19 @@
 package dsl
 
+import dsl.QuantifierBehaviorType.*
 import dsl.RepetitionType.*
 
 abstract class Group : Regex() {
     abstract override fun toString(): String
 }
 
-class AnchorGroup(private val anchor: Anchor) : Group() {
+class Range(private val range: CharRange, private val negated: Boolean) : Group() {
     override fun toString(): String {
-        return anchor.code
+        return if (negated) {
+            "[^${range.first}-${range.last}]"
+        } else {
+            "${range.first}-${range.last}"
+        }
     }
 }
 
@@ -18,25 +23,42 @@ class CaptureGroup : Group() {
     }
 }
 
-class NonCaptureGroup : Group() {
-    override fun toString(): String {
-        return "(?:" + groups.joinToString(separator = "") + ")"
-    }
-}
+abstract class Quantifier(val behavior: QuantifierBehaviorType) : Group()
 
-class OptionalGroup : Group() {
+class OptionalGroup(behavior: QuantifierBehaviorType) : Quantifier(behavior) {
     override fun toString(): String {
-        return groups.joinToString(separator = "", prefix = "(?:", postfix = ")?")
-    }
-}
-
-class RepeatedGroup(private val rule: RepetitionType, private var min: Int, private var max: Int = min) : Group() {
-    override fun toString(): String {
-        return when (rule) {
-            EXACTLY -> groups.joinToString(separator = "", prefix = "(?:", postfix = "){$min,$max}")
-            AT_LEAST -> groups.joinToString(separator = "", prefix = "(?:", postfix = "){$min,}")
-            AT_MOST -> groups.joinToString(separator = "", prefix = "(?:", postfix = "){0,$max}")
+        val result = groups.joinToString(separator = "", prefix = "(?:", postfix = ")?")
+        
+        return when (behavior) {
+            GREEDY -> result
+            LAZY -> "$result?"
+            POSSESSIVE -> "$result+"
         }
+    }
+}
+
+class RepeatedGroup(
+        private val rule: RepetitionType,
+        private val min: Int,
+        private val max: Int = min,
+        behavior: QuantifierBehaviorType
+) : Quantifier(behavior) {
+    override fun toString(): String {
+        var result = groups.joinToString(separator = "", prefix = "(?:", postfix = ")")
+        
+        result = when (rule) {
+            EXACTLY -> "$result{$min,$max}"
+            AT_LEAST -> "$result{$min,}"
+            AT_MOST -> "$result{0,$max}"
+        }
+        
+        result = when (behavior) {
+            GREEDY -> result
+            LAZY -> "$result?"
+            POSSESSIVE -> "$result+"
+        }
+        
+        return result
     }
 }
 

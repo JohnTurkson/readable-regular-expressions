@@ -1,10 +1,6 @@
 package dsl
 
 class Selection : Group() {
-    private val positiveCharacters: MutableSet<Char> = sortedSetOf()
-    private val negativeCharacters: MutableSet<Char> = sortedSetOf()
-    private val positiveRanges: MutableSet<CharRange> = sortedSetOf(compareBy(CharRange::first))
-    private val negativeRanges: MutableSet<CharRange> = sortedSetOf(compareBy(CharRange::first))
     
     override fun toString(): String {
         var result = ""
@@ -36,23 +32,28 @@ class Selection : Group() {
             ) { "${it.first}-${it.last}" }
         }
         
-        if (groups.isNotEmpty()) {
-            if (result.isNotEmpty()) result += "|"
-            result += groups.joinToString(separator = "|", prefix = "(?:", postfix = ")")
-        }
+        return ""
         
-        return "(?:$result)"
-    }
-    
-    fun character(negated: Boolean = false, init: Selection.() -> Char): Selection {
-        val character = Selection().init()
-        if (negated) negativeCharacters += character else positiveCharacters += character
-        return this
-    }
-    
-    fun range(negated: Boolean = false, init: Selection.() -> CharRange): Selection {
-        val range = Selection().init()
-        if (negated) negativeRanges += range else positiveRanges += range
-        return this
+        // var result = ""
+        //
+        // if (positiveSelections.isNotEmpty()) {
+        //     result += positiveSelections.joinToString(separator = "", prefix = "[", postfix = "]")
+        // }
+        //
+        // if (negativeSelections.isNotEmpty()) {
+        //     if (result.isNotEmpty()) result += "|"
+        //     result += negativeSelections.joinToString(separator = "", prefix = "[", postfix = "]")
+        // }
+        //
+        // if (groups.isNotEmpty()) {
+        //     if (result.isNotEmpty()) result += "|"
+        //     result += groups.joinToString(separator = "|", prefix = "(?:", postfix = ")")
+        // }
+        //
+        // if (result.isNotEmpty()) {
+        //     result = "(?:$result)"
+        // }
+        //
+        // return result
     }
 }
