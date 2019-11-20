@@ -4,7 +4,7 @@ class Selection : Group() {
     
     override fun toString(): String {
         var result = ""
-        
+    
         for (g in groups) {
             result += when (g) {
                 is Character -> g.toString()
@@ -12,7 +12,7 @@ class Selection : Group() {
                 else -> g.toString()
             }
         }
-        
+    
         return result
         
         // var result = ""
