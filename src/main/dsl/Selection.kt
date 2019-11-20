@@ -5,34 +5,15 @@ class Selection : Group() {
     override fun toString(): String {
         var result = ""
         
-        if (positiveCharacters.isNotEmpty()) {
-            result += positiveCharacters.joinToString(separator = "", prefix = "[", postfix = "]")
+        for (g in groups) {
+            result += when (g) {
+                is Character -> g.toString()
+                // TODO
+                else -> g.toString()
+            }
         }
         
-        if (negativeCharacters.isNotEmpty()) {
-            if (result.isNotEmpty()) result += "|"
-            result += negativeCharacters.joinToString(separator = "", prefix = "[^", postfix = "]")
-        }
-        
-        if (positiveRanges.isNotEmpty()) {
-            if (result.isNotEmpty()) result += "|"
-            result += positiveRanges.joinToString(
-                    separator = "",
-                    prefix = "[",
-                    postfix = "]"
-            ) { "${it.first}-${it.last}" }
-        }
-        
-        if (negativeRanges.isNotEmpty()) {
-            if (result.isNotEmpty()) result += "|"
-            result += negativeRanges.joinToString(
-                    separator = "",
-                    prefix = "[^",
-                    postfix = "]"
-            ) { "${it.first}-${it.last}" }
-        }
-        
-        return ""
+        return result
         
         // var result = ""
         //
