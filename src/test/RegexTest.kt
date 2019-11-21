@@ -202,7 +202,7 @@ internal class RegexTest {
             
             matches { "8 " }
             matches { "1c" }
-            matches { "1'" }
+            matches { "1_" }
             matches { "14" }
             no_match { "ad" }
             no_match { "9ad" }
@@ -213,12 +213,14 @@ internal class RegexTest {
     
     @Test
     fun testNegatedRange() {
+        print(regex {
+            range(negated = true) { 'a'..'z' }}.toString())
         regex {
             range(negated = true) { 'a'..'z' }
             
-            matches { "12846" }
-            matches { "!$%$^&%*" }
-            no_match { "aksj" }
+            matches { "1" }
+            matches { "!" }
+            no_match { "a" }
         }
     }
     

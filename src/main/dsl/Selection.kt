@@ -3,7 +3,7 @@ package dsl
 class Selection : Group() {
     
     override fun toString(): String {
-        var result = ""
+        var result = "("
     
         for (g in groups) {
             result += when (g) {
@@ -11,7 +11,9 @@ class Selection : Group() {
                 // TODO
                 else -> g.toString()
             }
+            result += "|"
         }
+        result += ")"
     
         return result
         
