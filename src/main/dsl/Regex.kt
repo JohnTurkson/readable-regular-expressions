@@ -6,6 +6,7 @@ import dsl.RepetitionType.*
 
 open class Regex {
     internal val groups: MutableList<Regex> = mutableListOf()
+    internal val tests: MutableList<TestCase> = mutableListOf()
     
     override fun toString(): String {
         return groups.joinToString(separator = "")
@@ -120,8 +121,29 @@ open class Regex {
         groups += regex
         return this
     }
+    
+    // TODO enforce grouping
+    fun matches(init: Match.() -> String): Regex {
+        val t = Match(Match("").init())
+        tests += t
+        return this
+    }
+    
+    fun no_match(init: NoMatch.() -> String): Regex {
+        val noMatch = NoMatch(NoMatch("").init())
+        tests += noMatch
+        return this
+    }
+    
+    fun runTests(exp : kotlin.text.Regex) {
+        for (test in tests) {
+            test.run(exp)
+        }
+    }
 }
 
 fun regex(init: Regex.() -> Regex): kotlin.text.Regex {
-    return Regex(Regex().init().toString())
+    val regex = Regex().init()
+    regex.runTests(Regex(regex.toString()))
+    return Regex(regex.toString())
 }
