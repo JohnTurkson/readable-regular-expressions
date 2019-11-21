@@ -13,6 +13,7 @@ class Selection : Group() {
             }
             result += "|"
         }
+        result = result.dropLast(1)
         result += ")"
     
         return result

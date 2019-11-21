@@ -104,14 +104,6 @@ internal class RegexTest {
             no_match { "0" }
         }
         
-        
-        println(regex {
-            either {
-                literal { "a" }
-                literal { "b" }
-                literal { "c" }
-            }
-        })
         regex {
             either {
                 literal { "a" }
@@ -213,8 +205,6 @@ internal class RegexTest {
     
     @Test
     fun testNegatedRange() {
-        print(regex {
-            range(negated = true) { 'a'..'z' }}.toString())
         regex {
             range(negated = true) { 'a'..'z' }
             
@@ -277,4 +267,57 @@ internal class RegexTest {
             no_match { "rrrrr" }
         }
     }
+    
+    @Test
+    fun testCharacter() {
+        regex {
+            character(negated = true) { 'x' }
+            
+            matches { "y" }
+            no_match { "x" }
+        }
+    }
+    
+    @Test
+    fun testEscape() {
+        regex {
+            either{
+                escape { EscapeType.BACKSLASH }
+                escape { EscapeType.NEWLINE }
+                escape { EscapeType.TAB }
+                escape { EscapeType.RETURN }
+            }
+            
+            matches { "\\" }
+            matches { "\n" }
+            matches { "\t" }
+            matches { "\r" }
+            no_match { " " }
+            no_match { "a" }
+        }
+    }
+    
+    // TODO
+//    @Test
+//    fun testAtomicGroup() {
+//        regex {
+//
+//        }
+//    }
+    
+    // TODO
+//    @Test
+//    fun testCaptureGroup() {
+//        regex {
+//
+//        }
+//    }
+    
+    // TODO
+//    @Test
+//    fun testLookaround() {
+//        regex {
+//
+//        }
+//    }
 }

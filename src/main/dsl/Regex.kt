@@ -42,6 +42,12 @@ open class Regex {
         return this
     }
     
+    fun escape(init: () -> EscapeType): Regex {
+        val e = Escape(init())
+        groups += e
+        return this
+    }
+    
     fun capture(init: CaptureGroup.() -> Regex): Regex {
         val captureGroup = CaptureGroup().init()
         groups += captureGroup
@@ -122,7 +128,7 @@ open class Regex {
         return this
     }
     
-    // TODO enforce grouping
+    // TODO enforce grouping (optional)
     fun matches(init: Match.() -> String): Regex {
         val t = Match(Match("").init())
         tests += t
