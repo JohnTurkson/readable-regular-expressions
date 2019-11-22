@@ -6,6 +6,7 @@ import dsl.RepetitionType.*
 
 open class Regex {
     internal val groups: MutableList<Regex> = mutableListOf()
+    internal val tests: MutableList<TestCase> = mutableListOf()
     
     override fun toString(): String {
         return groups.joinToString(separator = "")
@@ -18,7 +19,7 @@ open class Regex {
     }
     
     fun character(negated: Boolean = false, init: Selection.() -> Char): Regex {
-        val character = Character(Selection().init(), negated)
+        val character = Character(Selection(false).init(), negated)
         groups += character
         return this
     }
@@ -30,14 +31,20 @@ open class Regex {
     }
     
     fun range(negated: Boolean = false, init: Selection.() -> CharRange): Regex {
-        val range = Range(Selection().init(), negated)
+        val range = Range(Selection(false).init(), negated)
         groups += range
         return this
     }
     
     fun metacharacter(negated: Boolean = false, init: Selection.() -> MetacharacterType): Regex {
-        val metacharacter = Metacharacter(Selection().init(), negated)
+        val metacharacter = Metacharacter(Selection(false).init(), negated)
         groups += metacharacter
+        return this
+    }
+    
+    fun escape(init: () -> EscapeType): Regex {
+        val e = Escape(init())
+        groups += e
         return this
     }
     
@@ -88,7 +95,13 @@ open class Regex {
     }
     
     fun either(init: Selection.() -> Regex): Regex {
-        val selection = Selection().init()
+        val selection = Selection(false).init()
+        groups += selection
+        return this
+    }
+    
+    fun neither(init: Selection.() -> Regex): Regex {
+        val selection = Selection(true).init()
         groups += selection
         return this
     }
@@ -120,8 +133,29 @@ open class Regex {
         groups += regex
         return this
     }
+    
+    // TODO enforce grouping (optional)
+    fun matches(init: Match.() -> String): Regex {
+        val t = Match(Match("").init())
+        tests += t
+        return this
+    }
+    
+    fun no_match(init: NoMatch.() -> String): Regex {
+        val noMatch = NoMatch(NoMatch("").init())
+        tests += noMatch
+        return this
+    }
+    
+    fun runTests(exp : kotlin.text.Regex) {
+        for (test in tests) {
+            test.run(exp)
+        }
+    }
 }
 
 fun regex(init: Regex.() -> Regex): kotlin.text.Regex {
-    return Regex(Regex().init().toString())
+    val regex = Regex().init()
+    regex.runTests(Regex(regex.toString()))
+    return Regex(regex.toString())
 }

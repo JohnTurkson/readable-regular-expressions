@@ -12,7 +12,7 @@ class Range(private val range: CharRange, private val negated: Boolean) : Group(
         return if (negated) {
             "[^${range.first}-${range.last}]"
         } else {
-            "${range.first}-${range.last}"
+            "[${range.first}-${range.last}]"
         }
     }
 }

@@ -1,14 +1,14 @@
 package dsl
 
-class Escape: Group() {
+class Escape(val type: EscapeType): Group() {
     override fun toString(): String {
-        TODO()
+        return type.code
     }
 }
 
 enum class EscapeType(val code: String) {
-    TAB("\t"),
-    BACKSLASH("\\"),
-    RETURN("\r"),
-    NEWLINE("\n")
+    TAB("\\t"),
+    BACKSLASH("\\\\"),
+    RETURN("\\r"),
+    NEWLINE("\\n")
 }
