@@ -19,7 +19,7 @@ open class Regex {
     }
     
     fun character(negated: Boolean = false, init: Selection.() -> Char): Regex {
-        val character = Character(Selection().init(), negated)
+        val character = Character(Selection(false).init(), negated)
         groups += character
         return this
     }
@@ -31,13 +31,13 @@ open class Regex {
     }
     
     fun range(negated: Boolean = false, init: Selection.() -> CharRange): Regex {
-        val range = Range(Selection().init(), negated)
+        val range = Range(Selection(false).init(), negated)
         groups += range
         return this
     }
     
     fun metacharacter(negated: Boolean = false, init: Selection.() -> MetacharacterType): Regex {
-        val metacharacter = Metacharacter(Selection().init(), negated)
+        val metacharacter = Metacharacter(Selection(false).init(), negated)
         groups += metacharacter
         return this
     }
@@ -95,7 +95,13 @@ open class Regex {
     }
     
     fun either(init: Selection.() -> Regex): Regex {
-        val selection = Selection().init()
+        val selection = Selection(false).init()
+        groups += selection
+        return this
+    }
+    
+    fun neither(init: Selection.() -> Regex): Regex {
+        val selection = Selection(true).init()
         groups += selection
         return this
     }

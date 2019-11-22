@@ -151,25 +151,31 @@ internal class RegexTest {
     
     @Test
     fun testNoneOf() {
-        // TODO allow this behavior
-//        assertEquals("[^a-z]", regex {
-//            range(negated = true) { 'a'..'z' }
-//        }.toString())
-//
-//        assertEquals("[^abc]", regex {
-//            noneOf {
-//                "abc"
-//            }
-//        }.toString())
-//
-//        assertEquals("[^D-Fabc]", regex {
-//            noneOf {
-//                range { 'D'..'F' }
-//                literal { "a" }
-//                literal { "b" }
-//                literal { "c" }
-//            }
-//        }.toString())
+        regex {
+            range(negated = true) { 'a'..'z' }
+            
+            matches { "2" }
+            matches { "G" }
+            no_match { "a" }
+            no_match { "j" }
+        }
+        
+        regex {
+            neither {
+                range { 'D'..'F' }
+                literal { "a" }
+                literal { "b" }
+                literal { "c" }
+            }
+            
+            matches { "A" }
+            matches { "z" }
+            no_match { "D" }
+            no_match { "E" }
+            no_match { "F" }
+            no_match { "b" }
+            no_match { "c" }
+        }
     }
     
     @Test

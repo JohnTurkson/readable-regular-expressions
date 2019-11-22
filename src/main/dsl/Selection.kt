@@ -1,22 +1,37 @@
 package dsl
 
-class Selection : Group() {
+class Selection(val negated: Boolean) : Group() {
     
     override fun toString(): String {
-        var result = "("
+        var result = ""
+        if (negated) {
+            result += "[^"
     
-        for (g in groups) {
-            result += when (g) {
-                is Character -> g.toString()
-                // TODO
-                else -> g.toString()
+            for (g in groups) {
+                result += when (g) {
+                    is Character -> g.toString()
+                    else -> g.toString().replace("[", "").replace("]", "")
+                }
             }
-            result += "|"
-        }
-        result = result.dropLast(1)
-        result += ")"
+            result += "]"
     
-        return result
+            return result
+    
+        } else {
+            result += "("
+    
+            for (g in groups) {
+                result += when (g) {
+                    is Character -> g.toString()
+                    else -> g.toString()
+                }
+                result += "|"
+            }
+            result = result.dropLast(1)
+            result += ")"
+    
+            return result
+        }
         
         // var result = ""
         //
